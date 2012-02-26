@@ -21,3 +21,6 @@
 
 DELETE FROM `mangos_string` WHERE `entry` = 1605;
 INSERT INTO `mangos_string` VALUES ('1605', 'You have been awarded a token for slaying another player.', null, null, null, null, null, null, null, null);
+
+DELETE FROM `mangos_string` WHERE `entry` = 1606;
+INSERT INTO `mangos_string` VALUES ('1606', 'You dont have any space in your bags for a token.', null, null, null, null, null, null, null, null);

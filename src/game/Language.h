@@ -972,6 +972,7 @@ enum MangosStrings
 
 	// PvP Token System
     LANG_RECEIVE_PVP_TOKEN       = 1605,
+	LANG_RECEIVE_TOKEN_NO_FREE_SPACE    = 1606,
 	
     // Broadcaster
     LANG_AUTO_BROADCAST                 = 1300,

@@ -24508,19 +24508,22 @@ void Player::ReceivePvPToken()
         MapRestriction == 3 && !InBattleGround())
         return;
 
-
+	uint32 noSpaceForCount = 0;
     uint32 itemID = sWorld.getConfig(CONFIG_PVP_TOKEN_ITEMID);
     uint32 itemCount = sWorld.getConfig(CONFIG_PVP_TOKEN_ITEMCOUNT);
 
     ItemPosCountVec dest;
-    uint8 msg = CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, itemID, itemCount);
+	uint8 msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemID, itemCount, &noSpaceForCount);
     if( msg != EQUIP_ERR_OK )
+		itemCount = noSpaceForCount;
+
+    if(itemCount == 0 || dest.empty())
     {
-        SendEquipError( msg, NULL, NULL );
+        ChatHandler(this).PSendSysMessage(LANG_RECEIVE_TOKEN_NO_FREE_SPACE);
         return;
     }
 
-    Item* item = StoreNewItem( dest, itemID, true, Item::GenerateItemRandomPropertyId(itemID));
+    Item* item = StoreNewItem(dest, itemID, true, Item::GenerateItemRandomPropertyId(itemID));
     SendNewItem(item, itemCount, true, false);
 
     ChatHandler(this).PSendSysMessage(LANG_RECEIVE_PVP_TOKEN);
