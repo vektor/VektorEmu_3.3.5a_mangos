@@ -96,21 +96,6 @@ bool ChatHandler::HandleServerInfoCommand(char* /*args*/)
     uint32 maxQueuedClientsNum = sWorld.GetMaxQueuedSessionCount();
     std::string str = secsToTimeString(sWorld.GetUptime());
 
-    char const* full;
-    char const* fullR2;
-    if(m_session)
-    {
-        full = _FULLVERSION(REVISION_NR);
-        fullR2 = _R2FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_R2,"|cffffffff|Hurl:" REVISION_ID "|h" REVISION_ID "|h|r");
-    }
-    else
-    {
-        full = _FULLVERSION(REVISION_NR);
-        fullR2 = _R2FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_R2,REVISION_ID);
-    }
-    SendSysMessage(full);
-    SendSysMessage(fullR2);
-
     if (sScriptMgr.IsScriptLibraryLoaded())
     {
         char const* ver = sScriptMgr.GetScriptLibraryVersion();
