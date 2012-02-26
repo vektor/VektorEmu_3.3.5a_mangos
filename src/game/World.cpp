@@ -858,13 +858,13 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_TIMERBAR_FIRE_MAX,        "TimerBar.Fire.Max", 1);
 	
 	// PvP Token System
-    setConfig(CONFIG_CUSTOM_PVP_TOKEN_ENABLE,"PvPToken.Enable", false);
-    setConfig(CONFIG_CUSTOM_PVP_TOKEN_ITEMID,"PvPToken.ItemID", 43308);
-    setConfig(CONFIG_CUSTOM_PVP_TOKEN_ITEMCOUNT,"CPvPToken.ItemCount", 1);
-    setConfig(CONFIG_CUSTOM_PVP_TOKEN_RESTRICTION,"PvPToken.MapRestriction", 4);
+    setConfig(CONFIG_PVP_TOKEN_ENABLE,"PvPToken.Enable", false);
+    setConfig(CONFIG_PVP_TOKEN_ITEMID,"PvPToken.ItemID", 43308);
+    setConfig(CONFIG_PVP_TOKEN_ITEMCOUNT,"CPvPToken.ItemCount", 1);
+    setConfig(CONFIG_PVP_TOKEN_RESTRICTION,"PvPToken.MapRestriction", 4);
 
-    if(getConfig(CONFIG_CUSTOM_PVP_TOKEN_ITEMCOUNT) < 1)
-        setConfig(CONFIG_CUSTOM_PVP_TOKEN_ITEMCOUNT,"PvPToken.ItemCount",1);
+    if(getConfig(CONFIG_PVP_TOKEN_ITEMCOUNT) < 1)
+        setConfig(CONFIG_PVP_TOKEN_ITEMCOUNT,"PvPToken.ItemCount",1);
 
     setConfig(CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT,      "PetUnsummonAtMount", true);
 
