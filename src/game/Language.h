@@ -970,6 +970,9 @@ enum MangosStrings
 
     // FREE IDS                           1600-9999
 
+	// PvP Token System
+    LANG_RECEIVE_PVP_TOKEN       = 1605,
+	
     // Broadcaster
     LANG_AUTO_BROADCAST                 = 1300,
 

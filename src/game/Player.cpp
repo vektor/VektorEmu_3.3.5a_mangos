@@ -24494,6 +24494,38 @@ void Player::LoadAccountLinkedState()
         DEBUG_LOG("Player:RAF: loaded " SIZEFMTD " referal accounts for player %u",m_referalAccounts.size(),GetObjectGuid().GetCounter());
 }
 
+// Custom PvP Token
+void Player::ReceivePvPToken()
+{
+    if(!sWorld.getConfig(CONFIG_PVP_TOKEN_ENABLE))
+
+        return;
+
+    uint8 MapRestriction = sWorld.getConfig(CONFIG_PVP_TOKEN_RESTRICTION);
+
+    if( MapRestriction == 1 && !InBattleGround() && !HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP) ||
+        MapRestriction == 2 && !HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP) ||
+        MapRestriction == 3 && !InBattleGround())
+        return;
+
+
+    uint32 itemID = sWorld.getConfig(CONFIG_PVP_TOKEN_ITEMID);
+    uint32 itemCount = sWorld.getConfig(CONFIG_PVP_TOKEN_ITEMCOUNT);
+
+    ItemPosCountVec dest;
+    uint8 msg = CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, itemID, itemCount);
+    if( msg != EQUIP_ERR_OK )
+    {
+        SendEquipError( msg, NULL, NULL );
+        return;
+    }
+
+    Item* item = StoreNewItem( dest, itemID, true, Item::GenerateItemRandomPropertyId(itemID));
+    SendNewItem(item, itemCount, true, false);
+
+    ChatHandler(this).PSendSysMessage(LANG_RECEIVE_PVP_TOKEN);
+}
+
 bool Player::IsReferAFriendLinked(Player* target)
 {
     // check link this(refer) - target(referral)
