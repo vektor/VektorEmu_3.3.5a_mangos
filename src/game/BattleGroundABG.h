@@ -15,26 +15,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef __BATTLEGROUNDAA_H
-#define __BATTLEGROUNDAA_H
+
+#ifndef __BATTLEGROUNDABG_H
+#define __BATTLEGROUNDABG_H
 
 class BattleGround;
 
-class BattleGroundAAScore : public BattleGroundScore
+class BattleGroundABGScore : public BattleGroundScore
 {
     public:
-        BattleGroundAAScore() {};
-        virtual ~BattleGroundAAScore() {};
-        //TODO fix me
+        BattleGroundABGScore() {};
+        virtual ~BattleGroundABGScore() {};
 };
 
-class BattleGroundAA : public BattleGround
+class BattleGroundABG : public BattleGround
 {
     friend class BattleGroundMgr;
 
     public:
-        BattleGroundAA();
-        ~BattleGroundAA();
+        BattleGroundABG();
+        ~BattleGroundABG();
         void Update(uint32 diff);
 
         /* inherited from BattlegroundClass */
@@ -42,9 +42,13 @@ class BattleGroundAA : public BattleGround
         virtual void StartingEventCloseDoors();
         virtual void StartingEventOpenDoors();
 
-        void RemovePlayer(Player *plr, uint64 guid);
+        void RemovePlayer(Player *plr,uint64 guid);
         void HandleAreaTrigger(Player *Source, uint32 Trigger);
-        bool SetupBattleGround();
-        void HandleKillPlayer(Player* player, Player *killer);
+        //bool SetupBattleGround();
+
+        /* Scorekeeping */
+        void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
+
+    private:
 };
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,7 @@
 #ifndef __BATTLEGROUNDAB_H
 #define __BATTLEGROUNDAB_H
 
-#include "Common.h"
-#include "BattleGround.h"
+class BattleGround;
 
 enum BG_AB_WorldStates
 {
@@ -85,6 +84,7 @@ enum BG_AB_ObjectType
     BG_AB_OBJECT_MAX                     = 16,
 };
 
+
 /* node events */
 // node-events are just event1=BG_AB_Nodes, event2=BG_AB_NodeStatus
 // so we don't need to define the constants here :)
@@ -112,7 +112,6 @@ enum BG_AB_Nodes
 };
 
 #define BG_AB_NODES_MAX   5
-#define BG_AB_EVENT_START_BATTLE 9158
 
 enum BG_AB_NodeStatus
 {
@@ -135,16 +134,11 @@ enum BG_AB_Sounds
     BG_AB_SOUND_NEAR_VICTORY            = 8456
 };
 
-enum BG_AB_Objectives
-{
-    AB_OBJECTIVE_ASSAULT_BASE = 122,
-    AB_OBJECTIVE_DEFEND_BASE  = 123
-};
-
 #define BG_AB_NotABBGWeekendHonorTicks      330
 #define BG_AB_ABBGWeekendHonorTicks         200
 #define BG_AB_NotABBGWeekendReputationTicks 200
 #define BG_AB_ABBGWeekendReputationTicks    150
+#define BG_AB_ExperiencesTicks              260
 
 // Tick intervals and given points: case 0,1,2,3,4,5 captured nodes
 const uint32 BG_AB_TickIntervals[6] = {0, 12000, 9000, 6000, 3000, 1000};
@@ -190,11 +184,11 @@ class BattleGroundAB : public BattleGround
         void AddPlayer(Player *plr);
         virtual void StartingEventCloseDoors();
         virtual void StartingEventOpenDoors();
-        void RemovePlayer(Player *plr, ObjectGuid guid);
+        void RemovePlayer(Player *plr,uint64 guid);
         void HandleAreaTrigger(Player *Source, uint32 Trigger);
         virtual bool SetupBattleGround();
         virtual void Reset();
-        void EndBattleGround(Team winner);
+        void EndBattleGround(uint32 winner);
         virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
 
         /* Scorekeeping */
@@ -206,8 +200,10 @@ class BattleGroundAB : public BattleGround
         virtual void EventPlayerClickedOnFlag(Player *source, GameObject* target_obj);
 
         /* achievement req. */
-        bool IsAllNodesConrolledByTeam(Team team) const;    // overwrited
-        bool IsTeamScores500Disadvantage(Team team) const { return m_TeamScores500Disadvantage[GetTeamIndex(team)]; }
+        bool IsAllNodesConrolledByTeam(uint32 team) const;  // overwrited
+        bool IsTeamScores500Disadvantage(uint32 team) const { return m_TeamScores500Disadvantage[GetTeamIndexByTeamId(team)]; }
+
+		uint8 getNodePoint(uint8 idx) { return m_Nodes[idx]; }
     private:
         /* Gameobject spawning/despawning */
         void _CreateBanner(uint8 node, uint8 type, uint8 teamIndex, bool delay);
@@ -230,13 +226,15 @@ class BattleGroundAB : public BattleGround
         uint8               m_prevNodes[BG_AB_NODES_MAX];   // used for performant wordlstate-updating
         BG_AB_BannerTimer   m_BannerTimers[BG_AB_NODES_MAX];
         uint32              m_NodeTimers[BG_AB_NODES_MAX];
-        uint32              m_lastTick[PVP_TEAM_COUNT];
-        uint32              m_HonorScoreTics[PVP_TEAM_COUNT];
-        uint32              m_ReputationScoreTics[PVP_TEAM_COUNT];
+        uint32              m_lastTick[BG_TEAMS_COUNT];
+        uint32              m_HonorScoreTics[BG_TEAMS_COUNT];
+        uint32              m_ReputationScoreTics[BG_TEAMS_COUNT];
+        uint32              m_ExperiencesTicks[BG_TEAMS_COUNT];
         bool                m_IsInformedNearVictory;
         uint32              m_HonorTics;
         uint32              m_ReputationTics;
         // need for achievements
-        bool                m_TeamScores500Disadvantage[PVP_TEAM_COUNT];
+        bool                m_TeamScores500Disadvantage[BG_TEAMS_COUNT];
+		uint32				m_BgTimer;
 };
 #endif
