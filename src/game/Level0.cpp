@@ -29,7 +29,6 @@
 #include "SystemConfig.h"
 #include "revision.h"
 #include "revision_nr.h"
-#include "revision_R2.h"
 #include "Util.h"
 
 bool ChatHandler::HandleHelpCommand(char* args)
