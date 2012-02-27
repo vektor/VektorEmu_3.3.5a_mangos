@@ -105,7 +105,8 @@ bool ChatHandler::HandleServerInfoCommand(char* /*args*/)
     }
     else
         SendSysMessage(LANG_USING_SCRIPT_LIB_NONE);
-
+		
+	PSendSysMessage("VektorEmu based on MaNGOS Rev2 Core rev 11928 developped by PixelPirate");
     PSendSysMessage(LANG_USING_WORLD_DB,sWorld.GetDBVersion());
     PSendSysMessage(LANG_USING_EVENT_AI,sWorld.GetCreatureEventAIVersion());
     PSendSysMessage(LANG_CONNECTED_USERS, activeClientsNum, maxActiveClientsNum, queuedClientsNum, maxQueuedClientsNum);
