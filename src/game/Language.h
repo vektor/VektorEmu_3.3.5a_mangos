@@ -751,9 +751,25 @@ enum MangosStrings
     LANG_BATTLEGROUND_ONLY_HORDE_USE    = 753,              // "Only The Horde can use that portal"
 //                                      = 754, not used
 //                                      = 755, not used
-//                                      = 756, not used
-//                                      = 757, not used
-//                                      = 758, not used
+	// WG
+    LANG_BG_WG_BATTLE_STARTS            = 756,
+    LANG_BG_WG_DEFENDED                 = 757,
+    LANG_BG_WG_CAPTURED                 = 758,
+    LANG_BG_WG_WORKSHOP_DAMAGED         = 759,
+    LANG_BG_WG_WORKSHOP_DESTROYED       = 760,
+    LANG_BG_WG_TOWER_DAMAGED            = 761,
+    LANG_BG_WG_TOWER_DESTROYED          = 762,
+    LANG_BG_WG_FORTRESS_UNDER_ATTACK    = 763,
+    LANG_BG_WG_SWITCH_FACTION           = 764,
+    LANG_BG_WG_CHANGE_TIMER             = 765,
+    LANG_BG_WG_BATTLE_FORCE_START       = 766,
+    LANG_BG_WG_BATTLE_FORCE_STOP        = 767,
+    LANG_BG_WG_STATUS                   = 768,
+    LANG_BG_WG_DISABLE                  = 769,
+    LANG_BG_WG_ENABLE                   = 770,
+    LANG_BG_WG_RANK1                    = 771,
+    LANG_BG_WG_RANK2                    = 772,
+	// WG
     LANG_BG_AV_TOWER_TAKEN              = 759,
     LANG_BG_AV_TOWER_ASSAULTED          = 760,
     LANG_BG_AV_TOWER_DEFENDED           = 761,

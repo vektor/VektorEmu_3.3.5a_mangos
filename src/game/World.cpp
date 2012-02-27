@@ -857,7 +857,22 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_TIMERBAR_FIRE_GMLEVEL,    "TimerBar.Fire.GMLevel", SEC_CONSOLE);
     setConfig(CONFIG_UINT32_TIMERBAR_FIRE_MAX,        "TimerBar.Fire.Max", 1);
 	
+	// Wintergrasp
+    
+    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_ENABLED,"OutdoorPvP.Wintergrasp.Enabled", true);
+    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_START_TIME,"OutdoorPvP.Wintergrasp.StartTime", 30);
+    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_BATTLE_TIME,"OutdoorPvP.Wintergrasp.BattleTime", 30);
+    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_INTERVAL,"OutdoorPvP.Wintergrasp.Interval", 150);
+    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_CUSTOM_HONOR,"OutdoorPvP.Wintergrasp.CustomHonorRewards", false);
+    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_WIN_BATTLE,"OutdoorPvP.Wintergrasp.CustomHonorBattleWin", 3000);
+    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_LOSE_BATTLE,"OutdoorPvP.Wintergrasp.CustomHonorBattleLose", 1250);
+    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_DAMAGED_TOWER,"OutdoorPvP.Wintergrasp.CustomHonorDamageTower", 750);
+    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_DESTROYED_TOWER,"OutdoorPvP.Wintergrasp.CustomHonorDestroyedTower", 750);
+    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_DAMAGED_BUILDING,"OutdoorPvP.Wintergrasp.CustomHonorDamagedBuilding", 750);
+    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_INTACT_BUILDING,"OutdoorPvP.Wintergrasp.CustomHonorIntactBuilding", 1500);
+	
 	// PvP Token System
+	
     setConfig(CONFIG_PVP_TOKEN_ENABLE,"PvPToken.Enable", false);
     setConfig(CONFIG_PVP_TOKEN_ITEMID,"PvPToken.ItemID", 43308);
     setConfig(CONFIG_PVP_TOKEN_ITEMCOUNT,"CPvPToken.ItemCount", 1);
