@@ -24,7 +24,6 @@
 #include "WorldPvPSI.h"
 #include "WorldPvPTF.h"
 #include "WorldPvPZM.h"
-#include "OutdoorPvPWG.h"
 #include "Policies/SingletonImp.h"
 
 INSTANTIATE_SINGLETON_1( WorldPvPMgr );

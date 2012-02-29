@@ -52,7 +52,6 @@
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "MoveMap.h"                                        // for mmap manager
 #include "PathFinder.h"                                     // for mmap commands
-#include "OutdoorPvPWG.h"
 
 static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
 {
