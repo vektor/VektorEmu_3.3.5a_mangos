@@ -7949,6 +7949,14 @@ bool Unit::IsSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
                         }
                         break;
                     case SPELLFAMILY_PALADIN:
+						{
+							float ppmJoL = 15.0f;
+							WeaponAttackType attType = BASE_ATTACK;
+							uint32 WeaponSpeed = pVictim->GetAttackTime(attType);
+							float chanceForVictim = pVictim->GetPPMProcChance(WeaponSpeed, ppmJoL);
+							if (!roll_chance_f(chanceForVictim))
+								return false;
+						}
                         // Sacred Shield
                         if (spellProto->SpellFamilyFlags.test<CF_PALADIN_FLASH_OF_LIGHT>())
                         {
