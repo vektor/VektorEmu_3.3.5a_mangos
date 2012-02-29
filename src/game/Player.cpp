@@ -22948,6 +22948,11 @@ bool Player::CanStartFlyInArea(uint32 mapid, uint32 zone, uint32 area) const
 
     if (v_map == 571 && !HasSpell(54197))   // Cold Weather Flying
         return false;
+	
+	/*	WorldPvPWG *pvpWG = (WorldPvPWG*)sWorldPvPMgr.GetWorldPvPToZoneId(4197);
+    if (pvpWG && pvpWG->isWarTime() && zone == 4197)
+		return false;
+	*/
 
     // don't allow flying in Dalaran restricted areas
     // (no other zones currently has areas with AREA_FLAG_CANNOT_FLY)
