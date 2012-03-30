@@ -540,17 +540,17 @@ enum MangosStrings
     LANG_GAMEOBJECT_ADD                 = 525,
 
     LANG_MOVEGENS_LIST                  = 526,
-    LANG_MOVEGENS_IDLE                  = 527,
-    LANG_MOVEGENS_RANDOM                = 528,
-    LANG_MOVEGENS_WAYPOINT              = 529,
-    LANG_MOVEGENS_ANIMAL_RANDOM         = 530,
+    LANG_MOVEGENS_DEFAULT               = 527,
+//    LANG_MOVEGENS_RANDOM                = 528,
+//    LANG_MOVEGENS_WAYPOINT              = 529,
+//    LANG_MOVEGENS_ANIMAL_RANDOM         = 530,
     LANG_MOVEGENS_CONFUSED              = 531,
-    LANG_MOVEGENS_CHASE_PLAYER          = 532,
-    LANG_MOVEGENS_CHASE_CREATURE        = 533,
-    LANG_MOVEGENS_CHASE_NULL            = 534,
+    LANG_MOVEGENS_CHASE_TARGET          = 532,
+//    LANG_MOVEGENS_CHASE_CREATURE        = 533,
+//    LANG_MOVEGENS_CHASE_NULL            = 534,
     LANG_MOVEGENS_HOME_CREATURE         = 535,
     LANG_MOVEGENS_HOME_PLAYER           = 536,
-    LANG_MOVEGENS_FLIGHT                = 537,
+//    LANG_MOVEGENS_FLIGHT                = 537,
     LANG_MOVEGENS_UNKNOWN               = 538,
 
     LANG_NPCINFO_CHAR                   = 539,
@@ -751,25 +751,9 @@ enum MangosStrings
     LANG_BATTLEGROUND_ONLY_HORDE_USE    = 753,              // "Only The Horde can use that portal"
 //                                      = 754, not used
 //                                      = 755, not used
-	// WG
-    LANG_BG_WG_BATTLE_STARTS            = 756,
-    LANG_BG_WG_DEFENDED                 = 757,
-    LANG_BG_WG_CAPTURED                 = 758,
-    LANG_BG_WG_WORKSHOP_DAMAGED         = 759,
-    LANG_BG_WG_WORKSHOP_DESTROYED       = 760,
-    LANG_BG_WG_TOWER_DAMAGED            = 761,
-    LANG_BG_WG_TOWER_DESTROYED          = 762,
-    LANG_BG_WG_FORTRESS_UNDER_ATTACK    = 763,
-    LANG_BG_WG_SWITCH_FACTION           = 764,
-    LANG_BG_WG_CHANGE_TIMER             = 765,
-    LANG_BG_WG_BATTLE_FORCE_START       = 766,
-    LANG_BG_WG_BATTLE_FORCE_STOP        = 767,
-    LANG_BG_WG_STATUS                   = 768,
-    LANG_BG_WG_DISABLE                  = 769,
-    LANG_BG_WG_ENABLE                   = 770,
-    LANG_BG_WG_RANK1                    = 771,
-    LANG_BG_WG_RANK2                    = 772,
-	// WG
+//                                      = 756, not used
+//                                      = 757, not used
+//                                      = 758, not used
     LANG_BG_AV_TOWER_TAKEN              = 759,
     LANG_BG_AV_TOWER_ASSAULTED          = 760,
     LANG_BG_AV_TOWER_DEFENDED           = 761,
@@ -894,9 +878,9 @@ enum MangosStrings
     LANG_TAXINODE_ENTRY_LIST_CONSOLE    = 1129,
     LANG_EVENT_STARTED                  = 1130,
     LANG_EVENT_STOPPED                  = 1131,
-    LANG_MOVEGENS_FOLLOW_PLAYER         = 1132,
-    LANG_MOVEGENS_FOLLOW_CREATURE       = 1133,
-    LANG_MOVEGENS_FOLLOW_NULL           = 1134,
+    LANG_MOVEGENS_FOLLOW_TARGET         = 1132,
+//    LANG_MOVEGENS_FOLLOW_CREATURE       = 1133,
+//    LANG_MOVEGENS_FOLLOW_NULL           = 1134,
     LANG_LIST_TALENTS_TITLE             = 1135,
     LANG_LIST_TALENTS_COUNT             = 1136,
     LANG_GO_LIST_CHAT                   = 1137,
@@ -986,10 +970,11 @@ enum MangosStrings
 
     // FREE IDS                           1600-9999
 
-	// PvP Token System
-    LANG_RECEIVE_PVP_TOKEN       = 1605,
-	LANG_RECEIVE_TOKEN_NO_FREE_SPACE    = 1606,
-	
+    // PvP Token System
+
+    LANG_RECEIVE_PVP_TOKEN              = 1605,
+    LANG_RECEIVE_TOKEN_NO_FREE_SPACE    = 1606,
+
     // Broadcaster
     LANG_AUTO_BROADCAST                 = 1300,
 

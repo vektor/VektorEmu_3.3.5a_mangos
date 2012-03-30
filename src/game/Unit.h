@@ -38,6 +38,7 @@
 #include "SpellAuras.h"
 #include "Timer.h"
 #include <list>
+#include "StateMgr.h"
 
 enum SpellInterruptFlags
 {
@@ -163,17 +164,16 @@ enum UnitStandFlags
     UNIT_STAND_FLAGS_ALL          = 0xFF
 };
 
-// byte flags value (UNIT_FIELD_BYTES_1,2)
-// This corresponds to free talent points (pet case)
-
 // byte flags value (UNIT_FIELD_BYTES_1,3)
 enum UnitBytes1_Flags
 {
     UNIT_BYTE1_FLAG_ALWAYS_STAND = 0x01,
-    UNIT_BYTE1_FLAG_UNK_2        = 0x02,                    // Creature that can fly and are not on the ground appear to have this flag. If they are on the ground, flag is not present.
+    UNIT_BYTE1_FLAG_HOVER        = 0x02,                    // Creature that can fly and are not on the ground appear to have this flag. If they are on the ground, flag is not present.
     UNIT_BYTE1_FLAG_UNK_3        = 0x04,
     UNIT_BYTE1_FLAG_ALL          = 0xFF
 };
+
+#define UNIT_BYTE1_FLAG_UNK_2 UNIT_BYTE1_FLAG_HOVER
 
 // byte value (UNIT_FIELD_BYTES_2,0)
 enum SheathState
@@ -688,15 +688,15 @@ enum SplineFlags
     SPLINEFLAG_FINALTARGET  = 0x00010000,
     SPLINEFLAG_FINALFACING  = 0x00020000,
     SPLINEFLAG_CATMULLROM   = 0x00040000,
-    SPLINEFLAG_UNKNOWN1     = 0x00080000,
-    SPLINEFLAG_UNKNOWN2     = 0x00100000,
-    SPLINEFLAG_UNKNOWN3     = 0x00200000,
-    SPLINEFLAG_UNKNOWN4     = 0x00400000,
-    SPLINEFLAG_UNKNOWN5     = 0x00800000,
-    SPLINEFLAG_UNKNOWN6     = 0x01000000,
+    SPLINEFLAG_CYCLIC       = 0x00080000,
+    SPLINEFLAG_ENTER_CYCLE  = 0x00100000,
+    SPLINEFLAG_ANIMATION    = 0x00200000,
+    SPLINEFLAG_FROZEN       = 0x00400000,
+    SPLINEFLAG_TRANSPORT    = 0x00800000,
+    SPLINEFLAG_TRANSPORT_EXIT = 0x01000000,
     SPLINEFLAG_UNKNOWN7     = 0x02000000,
     SPLINEFLAG_UNKNOWN8     = 0x04000000,
-    SPLINEFLAG_UNKNOWN9     = 0x08000000,
+    SPLINEFLAG_ORIENTATION_INVERCED = 0x08000000,
     SPLINEFLAG_UNKNOWN10    = 0x10000000,
     SPLINEFLAG_UNKNOWN11    = 0x20000000,
     SPLINEFLAG_UNKNOWN12    = 0x40000000
@@ -724,7 +724,7 @@ class MovementInfo
 
     public:
         MovementInfo() : moveFlags(MOVEFLAG_NONE), moveFlags2(MOVEFLAG2_NONE), time(0),
-            t_time(0), t_seat(-1), t_seatInfo(NULL), t_time2(0), s_pitch(0.0f), fallTime(0), u_unk1(0.0f) {}
+            t_time(0), t_seat(-1), t_seatInfo(NULL), t_time2(0), s_pitch(0.0f), fallTime(0), splineElevation(0.0f) {}
 
         // Read/Write methods
         void Read(ByteBuffer &data);
@@ -790,7 +790,7 @@ class MovementInfo
                 moveFlagsTmp |= MOVEFLAG_ONTRANSPORT;
 
             moveFlags  = moveFlagsTmp;
-            u_unk1     = targetInfo.u_unk1;
+            splineElevation     = targetInfo.splineElevation;
             time       = targetInfo.time;
             pos        = targetInfo.pos;
             s_pitch    = targetInfo.s_pitch;
@@ -830,7 +830,7 @@ class MovementInfo
         // jumping
         JumpInfo jump;
         // spline
-        float    u_unk1;
+        float    splineElevation;
 };
 
 inline ByteBuffer& operator<< (ByteBuffer& buf, MovementInfo const& mi)
@@ -1435,10 +1435,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 GetSpellCritDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_SPELL, 2.2f, 33.0f, damage); }
 
         // player or player's pet resilience (-1%), cap 100%
-        uint32 GetMeleeDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_MELEE, 2.2f, 100.0f, damage); }
-        uint32 GetRangedDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_RANGED, 2.2f, 100.0f, damage); }
-        uint32 GetSpellDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_SPELL, 2.2f, 100.0f, damage); } 
-		
+        uint32 GetMeleeDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_MELEE, 2.0f, 100.0f, damage); }
+        uint32 GetRangedDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_MELEE, 2.0f, 100.0f, damage); }
+        uint32 GetSpellDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_MELEE, 2.0f, 100.0f, damage); }
+
         float  MeleeSpellMissChance(Unit *pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const *spell);
         SpellMissInfo MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell);
         SpellMissInfo MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell);
@@ -1553,7 +1553,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SendSpellDamageImmune(Unit* target, uint32 spellId);
 
         void NearTeleportTo(float x, float y, float z, float orientation, bool casting = false);
-        void MonsterMoveJump(float x, float y, float z, float o, float speed, float height, bool isKnockBack = false, Unit* target = NULL);
+        void MonsterMoveToDestination(float x, float y, float z, float o, float speed, float height, bool isKnockBack = false, Unit* target = NULL);
         // recommend use MonsterMove/MonsterMoveWithSpeed for most case that correctly work with movegens
         // if used additional args in ... part then floats must explicitly casted to double
         void SendMonsterMoveTransport(WorldObject *transport, SplineType type, SplineFlags flags, uint32 moveTime, ...);
@@ -2068,6 +2068,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void removeFollower(FollowerReference* /*pRef*/ ) { /* nothing to do yet */ }
 
         MotionMaster* GetMotionMaster() { return &i_motionMaster; }
+        UnitStateMgr& GetUnitStateMgr() { return m_stateMgr; }
 
         bool IsStopped() const { return !(hasUnitState(UNIT_STAT_MOVING)); }
         void StopMoving();
@@ -2259,6 +2260,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         GuardianPetList m_guardianPets;
 
         ObjectGuid m_TotemSlot[MAX_TOTEM_SLOT];
+        UnitStateMgr m_stateMgr;
 
     private:                                                // Error traps for some wrong args using
         // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type

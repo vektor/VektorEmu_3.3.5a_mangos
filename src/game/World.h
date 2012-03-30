@@ -298,27 +298,13 @@ enum eConfigFloatValues
     CONFIG_FLOAT_CREATURE_FAMILY_ASSISTANCE_RADIUS,
     CONFIG_FLOAT_GROUP_XP_DISTANCE,
     CONFIG_FLOAT_THREAT_RADIUS,
-	
-	// Wintergrasp
-    
-    CONFIG_OUTDOORPVP_WINTERGRASP_ENABLED,
-    CONFIG_OUTDOORPVP_WINTERGRASP_START_TIME,
-    CONFIG_OUTDOORPVP_WINTERGRASP_BATTLE_TIME,
-    CONFIG_OUTDOORPVP_WINTERGRASP_INTERVAL,
-    CONFIG_OUTDOORPVP_WINTERGRASP_CUSTOM_HONOR,
-    CONFIG_OUTDOORPVP_WINTERGRASP_WIN_BATTLE,
-    CONFIG_OUTDOORPVP_WINTERGRASP_LOSE_BATTLE,
-    CONFIG_OUTDOORPVP_WINTERGRASP_DAMAGED_TOWER,
-    CONFIG_OUTDOORPVP_WINTERGRASP_DESTROYED_TOWER,
-    CONFIG_OUTDOORPVP_WINTERGRASP_DAMAGED_BUILDING,
-    CONFIG_OUTDOORPVP_WINTERGRASP_INTACT_BUILDING,
-	
-	// Custom PvP System
-	CONFIG_PVP_TOKEN_ENABLE,
+
+    // Custom PvP System
+    CONFIG_PVP_TOKEN_ENABLE,
     CONFIG_PVP_TOKEN_ITEMID,
     CONFIG_PVP_TOKEN_ITEMCOUNT,
     CONFIG_PVP_TOKEN_RESTRICTION,
-	
+
     CONFIG_FLOAT_GHOST_RUN_SPEED_WORLD,
     CONFIG_FLOAT_GHOST_RUN_SPEED_BG,
     CONFIG_FLOAT_PLAYERBOT_MINDISTANCE,
@@ -658,8 +644,6 @@ class World
         void UpdateResultQueue();
         void InitResultQueue();
 
-        void UpdateRealmCharCount(uint32 accid);
-
         LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const { if(m_availableDbcLocaleMask & (1 << locale)) return locale; else return m_defaultDbcLocale; }
 
         //used World DB version
@@ -676,8 +660,6 @@ class World
 
     protected:
         void _UpdateGameTime();
-        // callback for UpdateRealmCharacters
-        void _UpdateRealmCharCount(QueryResult *resultCharCount, uint32 accountId);
 
         void InitDailyQuestResetTime();
         void InitWeeklyQuestResetTime();

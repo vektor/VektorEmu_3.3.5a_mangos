@@ -208,7 +208,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectSuspendGravity,                           //145 SPELL_EFFECT_SUSPEND_GRAVITY          Black Hole Effect
     &Spell::EffectActivateRune,                             //146 SPELL_EFFECT_ACTIVATE_RUNE
     &Spell::EffectQuestFail,                                //147 SPELL_EFFECT_QUEST_FAIL               quest fail
-    &Spell::EffectNULL,                                     //148 SPELL_EFFECT_148                      single spell: Inflicts Fire damage to an enemy.
+    &Spell::EffectTriggerMissileSpell,                      //148 SPELL_EFFECT_TRIGGER_MISSILE_2        single spell: Inflicts Fire damage to an enemy.
     &Spell::EffectCharge2,                                  //149 SPELL_EFFECT_CHARGE2                  swoop
     &Spell::EffectQuestStart,                               //150 SPELL_EFFECT_QUEST_START
     &Spell::EffectTriggerRitualOfSummoning,                 //151 SPELL_EFFECT_TRIGGER_SPELL_2
@@ -2722,9 +2722,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     if (pTargetDummy)
                     {
-                        if (unitTarget->hasUnitState(UNIT_STAT_FOLLOW | UNIT_STAT_FOLLOW_MOVE))
-                            unitTarget->GetMotionMaster()->MovementExpired();
-
                         unitTarget->MonsterMoveWithSpeed(pTargetDummy->GetPositionX(), pTargetDummy->GetPositionY(), pTargetDummy->GetPositionZ(), 24.f);
 
                         // Add state to temporarily prevent follow
@@ -3334,7 +3331,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     Unit* pZerg = unitTarget->GetMiniPet();
                     if (pZerg && pZerg->isAlive() && pZerg->GetEntry() == 11327)
                     {
-                        pZerg->GetMotionMaster()->MovementExpired();
+                        pZerg->GetUnitStateMgr().InitDefaults();
                         m_caster->DealDamage(pZerg, unitTarget->GetMaxHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
                         ((Creature*)pZerg)->ForcedDespawn(5000);
                     }
@@ -3347,7 +3344,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     m_caster->DealDamage(unitTarget, unitTarget->GetMaxHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
                     ((Pet*)unitTarget)->Unsummon(PET_SAVE_AS_DELETED);
-                    m_caster->GetMotionMaster()->MovementExpired();
+                    m_caster->GetUnitStateMgr().InitDefaults();
                     return;
                 }
                 case 68576:                                 // Eject All Passengers (also used in encounters Lich King, Jaraxxus?)
@@ -4666,7 +4663,7 @@ void Spell::EffectTriggerMissileSpell(SpellEffectIndex effect_idx)
     uint32 triggered_spell_id = m_spellInfo->EffectTriggerSpell[effect_idx];
 
     // normal case
-    SpellEntry const *spellInfo = sSpellStore.LookupEntry( triggered_spell_id );
+    SpellEntry const* spellInfo = sSpellStore.LookupEntry(triggered_spell_id);
 
     if (!spellInfo)
     {
@@ -4681,17 +4678,25 @@ void Spell::EffectTriggerMissileSpell(SpellEffectIndex effect_idx)
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
         ((Player*)m_caster)->RemoveSpellCooldown(triggered_spell_id);
 
-    // Init dest coordinates
-    float x,y,z;
-    x = m_targets.m_destX;
-    y = m_targets.m_destY;
-    z = m_targets.m_destZ;
+    if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION || m_caster == unitTarget )
+    {
+        // Init dest coordinates
+        float x,y,z;
+        x = m_targets.m_destX;
+        y = m_targets.m_destY;
+        z = m_targets.m_destZ;
 
-    MaNGOS::NormalizeMapCoord(x);
-    MaNGOS::NormalizeMapCoord(y);
-    m_caster->UpdateAllowedPositionZ(x,y,z);
+        MaNGOS::NormalizeMapCoord(x);
+        MaNGOS::NormalizeMapCoord(y);
+        m_caster->UpdateAllowedPositionZ(x,y,z);
 
-    m_caster->CastSpell(x, y, z, spellInfo, true, m_CastItem, 0, m_originalCasterGUID);
+        m_caster->CastSpell(x, y, z, spellInfo, true, m_CastItem, NULL, m_originalCasterGUID);
+    }
+    else
+    {
+        Unit* caster = IsSpellWithCasterSourceTargetsOnly(spellInfo) ? unitTarget : m_caster;
+        caster->CastSpell(unitTarget,spellInfo,true,m_CastItem,NULL,m_originalCasterGUID);
+    }
 }
 
 void Spell::EffectJump(SpellEffectIndex eff_idx)
@@ -4752,7 +4757,7 @@ void Spell::EffectJump(SpellEffectIndex eff_idx)
     if (pTarget == m_caster)
         pTarget = NULL;
 
-    m_caster->MonsterMoveJump(x, y, z, o, float(speed_xy) / 2, float(speed_z) / 10, false, pTarget);
+    m_caster->MonsterMoveToDestination(x, y, z, o, float(speed_xy) / 2, float(speed_z) / 10, false, pTarget);
 }
 
 void Spell::EffectTeleportUnits(SpellEffectIndex eff_idx)
@@ -5688,7 +5693,8 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype, LockType lockType)
     if (!m_caster)
         return;
 
-    m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_USE);
+    if (!m_IsTriggeredSpell && isSpellBreakStealth(m_spellInfo))
+        m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_USE);
 
     if (gameObjTarget)
     {
@@ -6473,7 +6479,8 @@ void Spell::DoSummonWild(SpellEffectIndex eff_idx, uint32 forceFaction)
 
     float ox, oy, oz;
     m_caster->GetPosition(ox, oy, oz);
-    m_caster->GetTerrain()->CheckPathAccurate(ox,oy,oz, center_x, center_y, center_z, sWorld.getConfig(CONFIG_BOOL_CHECK_GO_IN_PATH) ? m_caster : NULL );
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        m_caster->GetTerrain()->CheckPathAccurate(ox,oy,oz, center_x, center_y, center_z, sWorld.getConfig(CONFIG_BOOL_CHECK_GO_IN_PATH) ? m_caster : NULL );
     m_caster->UpdateAllowedPositionZ(center_x,center_y,center_z);
 
     float radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[eff_idx]));
@@ -6517,7 +6524,8 @@ void Spell::DoSummonWild(SpellEffectIndex eff_idx, uint32 forceFaction)
             }
         }
 
-        m_caster->GetTerrain()->CheckPathAccurate(ox,oy,oz, px, py, pz, sWorld.getConfig(CONFIG_BOOL_CHECK_GO_IN_PATH) ? m_caster : NULL );
+        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+            m_caster->GetTerrain()->CheckPathAccurate(ox,oy,oz, px, py, pz, sWorld.getConfig(CONFIG_BOOL_CHECK_GO_IN_PATH) ? m_caster : NULL );
         m_caster->UpdateAllowedPositionZ(px,py,pz);
 
         if (Creature* summon = m_caster->SummonCreature(creature_entry, px, py, pz, m_caster->GetOrientation(), summonType, m_duration))
@@ -8332,9 +8340,6 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                             // can only affect "own" summoned
                             if (pSummon->GetSummonerGuid() == m_caster->GetObjectGuid())
                             {
-                                if (pTarget->hasUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE))
-                                    pTarget->GetMotionMaster()->MovementExpired();
-
                                 // trigger cast of quest complete script (see code for this spell below)
                                 pTarget->CastSpell(pTarget, 44462, true);
 
@@ -9590,7 +9595,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     // Apply aura which causes black hole phase/1 sec to hostile targets
                     unitTarget->CastSpell(m_caster, 62185, true);
                 }
-                case 62168:									// Algalon - Black Hole Damage
+                case 62168:                                 // Algalon - Black Hole Damage
                 {
                     if (!unitTarget)
                         return;
@@ -9602,7 +9607,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 {
                     if (!unitTarget)
                         return;
-                    
+
                     // Cast Black hole spawn
                     m_caster->CastSpell(m_caster, 62189, true);
                     return;
@@ -11450,7 +11455,7 @@ void Spell::EffectCharge(SpellEffectIndex /*eff_idx*/)
 
     float speed = m_spellInfo->speed ? m_spellInfo->speed : BASE_CHARGE_SPEED;
 
-    m_caster->MonsterMoveJump(x, y, z, m_caster->GetOrientation(), speed, 0, false, unitTarget);
+    m_caster->MonsterMoveToDestination(x, y, z, m_caster->GetOrientation(), speed, 0, false, unitTarget);
 
     // not all charge effects used in negative spells
     if (unitTarget != m_caster && !IsPositiveSpell(m_spellInfo->Id))
@@ -11483,7 +11488,7 @@ void Spell::EffectCharge2(SpellEffectIndex /*eff_idx*/)
 
     float speed = m_spellInfo->speed ? m_spellInfo->speed : BASE_CHARGE_SPEED;
 
-    m_caster->MonsterMoveJump(x, y, z, m_caster->GetOrientation(), speed, 0, false, unitTarget);
+    m_caster->MonsterMoveToDestination(x, y, z, m_caster->GetOrientation(), speed, 0, false, unitTarget);
 
     // not all charge effects used in negative spells
     if (unitTarget && unitTarget != m_caster && !IsPositiveSpell(m_spellInfo->Id))
@@ -11831,15 +11836,22 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
             float angle_offset = max_angle * (rand_norm_f() - 0.5f);
             m_caster->GetNearPoint2D(fx, fy, dis, m_caster->GetOrientation() + angle_offset);
 
-            if (!m_caster->GetTerrain()->IsAboveWater(fx, fy, m_caster->GetPositionZ() + 0.5f, &fz))
+            if (!m_caster->GetTerrain()->IsAboveWater(fx, fy, m_caster->GetPositionZ() + 1.5f, &fz))
             {
                 SendCastResult(SPELL_FAILED_NOT_FISHABLE);
                 SendChannelUpdate(0);
                 return;
             }
 
+            if (m_caster->GetPositionZ() < (fz - 1.0f))
+            {
+                SendCastResult(SPELL_FAILED_ONLY_ABOVEWATER);
+                SendChannelUpdate(0);
+                return;
+            }
+
             // finally, check LoS
-            if (!m_caster->IsWithinLOS(fx, fy, fz))
+            if (!m_caster->IsWithinLOS(fx, fy, fz, false))
             {
                 SendCastResult(SPELL_FAILED_LINE_OF_SIGHT);
                 SendChannelUpdate(0);
@@ -12555,5 +12567,5 @@ void Spell::EffectSuspendGravity(SpellEffectIndex eff_idx)
     float speed  = float(m_spellInfo->EffectMiscValue[eff_idx]/2.0f);
     float height = float(unitTarget->GetDistance(x,y,z) / 10.0f);
 
-    unitTarget->MonsterMoveJump(x, y, z + 0.1f, unitTarget->GetOrientation(), speed, height, true, m_caster == unitTarget ? NULL : m_caster);
+    unitTarget->MonsterMoveToDestination(x, y, z + 0.1f, unitTarget->GetOrientation(), speed, height, true, m_caster == unitTarget ? NULL : m_caster);
 }

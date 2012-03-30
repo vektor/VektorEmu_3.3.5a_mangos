@@ -162,7 +162,7 @@ extern int main(int argc, char **argv)
 
     if (!sConfig.SetSource(cfg_file))
     {
-        sLog.outError("Could not find configuration file %s.", cfg_file);
+        sLog.outError("Impossible de trouver le fichier de configuration %s.", cfg_file);
         Log::WaitBeforeContinueIfNeed();
         return 1;
     }

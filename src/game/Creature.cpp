@@ -35,6 +35,7 @@
 #include "MapManager.h"
 #include "CreatureAI.h"
 #include "CreatureAISelector.h"
+#include "CreatureEventAI.h"
 #include "Formulas.h"
 #include "WaypointMovementGenerator.h"
 #include "InstanceData.h"
@@ -245,6 +246,7 @@ void Creature::RemoveCorpse()
     float x, y, z, o;
     GetRespawnCoord(x, y, z, &o);
     GetMap()->CreatureRelocation(this, x, y, z, o);
+    DisableSpline();
 }
 
 /**
@@ -510,7 +512,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 {
                     SetDeathState(JUST_DIED);
                     SetHealth(0);
-                    i_motionMaster.Clear();
+                    GetUnitStateMgr().InitDefaults();
                     clearUnitState(UNIT_STAT_ALL_STATE);
                     LoadCreatureAddon(true);
                 }
@@ -1541,7 +1543,7 @@ void Creature::SetDeathState(DeathState s)
             pet->Unsummon(PET_SAVE_AS_DELETED, this);
 
         if (CanFly())
-            i_motionMaster.MoveFall();
+            GetMotionMaster()->MoveFall();
 
         Unit::SetDeathState(CORPSE);
     }
@@ -1560,7 +1562,7 @@ void Creature::SetDeathState(DeathState s)
         Unit::SetDeathState(ALIVE);
 
         clearUnitState(UNIT_STAT_ALL_STATE);
-        i_motionMaster.Initialize();
+        GetMotionMaster()->Initialize();
 
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
 
@@ -2217,7 +2219,7 @@ bool Creature::HasSpellCooldown(uint32 spell_id) const
 
 bool Creature::IsInEvadeMode() const
 {
-    return !i_motionMaster.empty() && i_motionMaster.GetCurrentMovementGeneratorType() == HOME_MOTION_TYPE;
+    return i_motionMaster.GetCurrentMovementGeneratorType() == HOME_MOTION_TYPE;
 }
 
 bool Creature::HasSpell(uint32 spellID)
@@ -2618,3 +2620,47 @@ void Creature::SetLevitate(bool enable)
     data << GetPackGUID();
     SendMessageToSet(&data, true);
 }
+
+bool AttackResumeEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    if (!m_owner.isAlive())
+        return true;
+
+    if (m_owner.hasUnitState(UNIT_STAT_CAN_NOT_REACT) || m_owner.HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+        return true;
+
+    Unit* victim = m_owner.getVictim();
+
+    if (!victim)
+        return true;
+
+    m_owner.AttackStop(!b_force);
+
+    switch(m_owner.GetObjectGuid().GetHigh())
+    {
+        case HIGHGUID_UNIT:
+        case HIGHGUID_VEHICLE:
+        {
+            CreatureAI* ai = ((Creature*)&m_owner)->AI();
+            if (ai)
+            {
+            // Reset EventAI now unsafe, temp disabled (require correct writing EventAI scripts)
+            //    if (CreatureEventAI* eventai = (CreatureEventAI*)ai)
+            //        eventai->Reset();
+                ai->AttackStart(victim);
+            }
+            break;
+        }
+        case HIGHGUID_PET:
+        {
+           ((Pet*)&m_owner)->AI()->AttackStart(victim);
+            break;
+        }
+        case HIGHGUID_PLAYER:
+        default:
+            sLog.outError("AttackResumeEvent::Execute try execute for unsupported owner %s!", m_owner.GetObjectGuid().GetString().c_str());
+        break;
+    }
+    return true;
+}
+

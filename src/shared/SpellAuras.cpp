@@ -3917,29 +3917,11 @@ void Aura::HandleAuraHover(bool apply, bool Real)
 
     WorldPacket data;
     if (apply)
-    {
-        GetTarget()->m_movementInfo.AddMovementFlag(MOVEFLAG_HOVER);
-        data.Initialize(GetTarget()->GetTypeId() == TYPEID_PLAYER ? SMSG_MOVE_SET_HOVER : SMSG_SPLINE_MOVE_SET_HOVER, 8+4);
-        data << GetTarget()->GetPackGUID();
-        if (GetTarget()->GetTypeId() == TYPEID_PLAYER)
-        {
-            data << uint32(0);
-        }
-        else
-            GetTarget()->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
-    }
+        data.Initialize(SMSG_MOVE_SET_HOVER, 8+4);
     else
-    {
-        GetTarget()->m_movementInfo.RemoveMovementFlag(MOVEFLAG_HOVER);
-        data.Initialize(GetTarget()->GetTypeId() == TYPEID_PLAYER ? SMSG_MOVE_UNSET_HOVER : SMSG_SPLINE_MOVE_UNSET_HOVER, 8+4);
-        data << GetTarget()->GetPackGUID();
-        if (GetTarget()->GetTypeId() == TYPEID_PLAYER)
-        {
-            data << uint32(0);
-        }
-        else
-            GetTarget()->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
-    }
+        data.Initialize(SMSG_MOVE_UNSET_HOVER, 8+4);
+    data << GetTarget()->GetPackGUID();
+    data << uint32(0);
     GetTarget()->SendMessageToSet(&data, true);
 }
 

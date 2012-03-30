@@ -856,22 +856,8 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_TIMERBAR_BREATH_MAX,      "TimerBar.Breath.Max", 180);
     setConfig(CONFIG_UINT32_TIMERBAR_FIRE_GMLEVEL,    "TimerBar.Fire.GMLevel", SEC_CONSOLE);
     setConfig(CONFIG_UINT32_TIMERBAR_FIRE_MAX,        "TimerBar.Fire.Max", 1);
-	
-	// Wintergrasp
-    
-    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_ENABLED,"OutdoorPvP.Wintergrasp.Enabled", true);
-    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_START_TIME,"OutdoorPvP.Wintergrasp.StartTime", 30);
-    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_BATTLE_TIME,"OutdoorPvP.Wintergrasp.BattleTime", 30);
-    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_INTERVAL,"OutdoorPvP.Wintergrasp.Interval", 150);
-    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_CUSTOM_HONOR,"OutdoorPvP.Wintergrasp.CustomHonorRewards", false);
-    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_WIN_BATTLE,"OutdoorPvP.Wintergrasp.CustomHonorBattleWin", 3000);
-    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_LOSE_BATTLE,"OutdoorPvP.Wintergrasp.CustomHonorBattleLose", 1250);
-    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_DAMAGED_TOWER,"OutdoorPvP.Wintergrasp.CustomHonorDamageTower", 750);
-    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_DESTROYED_TOWER,"OutdoorPvP.Wintergrasp.CustomHonorDestroyedTower", 750);
-    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_DAMAGED_BUILDING,"OutdoorPvP.Wintergrasp.CustomHonorDamagedBuilding", 750);
-    setConfig(CONFIG_OUTDOORPVP_WINTERGRASP_INTACT_BUILDING,"OutdoorPvP.Wintergrasp.CustomHonorIntactBuilding", 1500);
-	
-	// PvP Token System
+
+    // PvP Token System
 	
     setConfig(CONFIG_PVP_TOKEN_ENABLE,"PvPToken.Enable", false);
     setConfig(CONFIG_PVP_TOKEN_ITEMID,"PvPToken.ItemID", 43308);
@@ -880,6 +866,7 @@ void World::LoadConfigSettings(bool reload)
 
     if(getConfig(CONFIG_PVP_TOKEN_ITEMCOUNT) < 1)
         setConfig(CONFIG_PVP_TOKEN_ITEMCOUNT,"PvPToken.ItemCount",1);
+
 
     setConfig(CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT,      "PetUnsummonAtMount", true);
 
@@ -2052,7 +2039,7 @@ bool World::RemoveBanAccount(BanMode mode, std::string nameOrIP)
         if (mode == BAN_ACCOUNT)
             account = sAccountMgr.GetId (nameOrIP);
         else if (mode == BAN_CHARACTER)
-            account = sObjectMgr.GetPlayerAccountIdByPlayerName (nameOrIP);
+            account = sAccountMgr.GetPlayerAccountIdByPlayerName (nameOrIP);
 
         if (!account)
             return false;
@@ -2279,27 +2266,6 @@ void World::UpdateResultQueue()
     CharacterDatabase.ProcessResultQueue();
     WorldDatabase.ProcessResultQueue();
     LoginDatabase.ProcessResultQueue();
-}
-
-void World::UpdateRealmCharCount(uint32 accountId)
-{
-    CharacterDatabase.AsyncPQuery(this, &World::_UpdateRealmCharCount, accountId,
-        "SELECT COUNT(guid) FROM characters WHERE account = '%u'", accountId);
-}
-
-void World::_UpdateRealmCharCount(QueryResult *resultCharCount, uint32 accountId)
-{
-    if (resultCharCount)
-    {
-        Field *fields = resultCharCount->Fetch();
-        uint32 charCount = fields[0].GetUInt32();
-        delete resultCharCount;
-
-        LoginDatabase.BeginTransaction();
-        LoginDatabase.PExecute("DELETE FROM realmcharacters WHERE acctid= '%u' AND realmid = '%u'", accountId, realmID);
-        LoginDatabase.PExecute("INSERT INTO realmcharacters (numchars, acctid, realmid) VALUES (%u, %u, %u)", charCount, accountId, realmID);
-        LoginDatabase.CommitTransaction();
-    }
 }
 
 void World::InitWeeklyQuestResetTime()

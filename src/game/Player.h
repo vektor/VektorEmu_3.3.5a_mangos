@@ -40,6 +40,7 @@
 #include "SharedDefines.h"
 #include "LFG.h"
 #include "AntiCheat.h"
+#include "AccountMgr.h"
 
 // Playerbot mod
 #include "playerbot/PlayerbotMgr.h"
@@ -2044,10 +2045,10 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _ApplyWeaponDependentAuraMods(Item *item, WeaponAttackType attackType, bool apply);
         void _ApplyWeaponDependentAuraCritMod(Item *item, WeaponAttackType attackType, Aura* aura, bool apply);
         void _ApplyWeaponDependentAuraDamageMod(Item *item, WeaponAttackType attackType, Aura* aura, bool apply);
+	
+	// PvP Token System
+        void ReceivePvPToken();	
 
-		// PvP Token System
-        void ReceivePvPToken();
-		
         void _ApplyItemMods(Item *item,uint8 slot,bool apply);
         void _RemoveAllItemMods();
         void _ApplyAllItemMods();
@@ -2241,8 +2242,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         AccountLinkedState GetAccountLinkedState();
         bool IsReferAFriendLinked(Player * target);
         void LoadAccountLinkedState();
-        std::vector<uint32> m_referredAccounts;
-        std::vector<uint32> m_referalAccounts;
 
         /*********************************************************/
         /***                 VARIOUS SYSTEMS                   ***/
@@ -2272,6 +2271,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetMover(Unit* target) { m_mover = target ? target : this; }
         Unit* GetMover() const { return m_mover; }
         bool IsSelfMover() const { return m_mover == this; }// normal case for player not controlling other unit
+        void InterruptTaxiFlying();
 
         ObjectGuid const& GetFarSightGuid() const { return GetGuidValue(PLAYER_FARSIGHT); }
 

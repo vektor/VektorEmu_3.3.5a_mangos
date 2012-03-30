@@ -1679,81 +1679,6 @@ BattleGround.PrematureFinishTimer = 300000
 BattleGround.PremadeGroupWaitForMatch = 1800000
 BattleGround.Random.ResetHour = 6
 
-###################################################################################################################
-#	WINTERGRASP CONFIG  /dev/PixelPirate for MaNGOSRev2 & VektorEmu Project
-#
-#	OutdoorPvP.Wintergrasp.Enabled
-#       Determines whether the Wintergrasp battle is enabled or not.
-#        Default: 0 = Disable
-#                 1 = Enable
-#
-#   OutdoorPvP.Wintergrasp.StartTime
-#       The start time of the first battle after server starts (in minutes)
-#       Default: 30
-#
-#   OutdoorPvP.Wintergrasp.BattleTime
-#       Time limit of a battle (in minutes)
-#       Default: 30
-#
-#   OutdoorPvP.Wintergrasp.Interval
-#       Interval between battles (in minutes)
-#       Default: 150
-#
-#   OutdoorPvP.Wintergrasp.CustomHonorRewards
-#       Defines whether custom honor rewards should be given to player
-#        for partaking in the Wintergrasp Battle.
-#        Default: 0 = Disable
-#                 1 = Enable
-#
-#   OutdoorPvP.Wintergrasp.CustomHonorBattleWin
-#       Defines the amount of honor points that should be given to the
-#        team winning the Wintergrasp Battle.
-#       Requires OutdoorPvP.Wintergrasp.CustomHonorRewards = 1.
-#       Default: 3000
-#
-#   OutdoorPvP.Wintergrasp.CustomHonorBattleLose
-#       Defines the amount of honor points that should be given to the
-#        team losing the Wintergrasp Battle.
-#       Requires OutdoorPvP.Wintergrasp.CustomHonorRewards = 1.
-#       Default: 1250
-#
-#   OutdoorPvP.Wintergrasp.CustomHonorDamageTower
-#       Defines the amount of honor points that should be given to the
-#        team for damaging a tower.
-#       Requires OutdoorPvP.Wintergrasp.CustomHonorRewards = 1.
-#       Default: 750
-#
-#   OutdoorPvP.Wintergrasp.CustomHonorDestroyedTower
-#       Defines the amount of honor points that should be given to the
-#        team for destroying a tower.
-#       Requires OutdoorPvP.Wintergrasp.CustomHonorRewards = 1.
-#       Default: 750
-#
-#   OutdoorPvP.Wintergrasp.CustomHonorDamagedBuilding
-#       Defines the amount of honor points that should be given to the
-#        team for damaged buildings after the battle.
-#       Requires OutdoorPvP.Wintergrasp.CustomHonorRewards = 1.
-#       Default: 750
-#
-#   OutdoorPvP.Wintergrasp.CustomHonorIntactBuilding
-#      Defines the amount of honor points that should be given to the
-#        team for intact buildings after the battle.
-#       Requires OutdoorPvP.Wintergrasp.CustomHonorRewards = 1.
-#       Default: 1500
-###################################################################################################################
-
-OutdoorPvP.Wintergrasp.Enabled = 0
-OutdoorPvP.Wintergrasp.StartTime = 30
-OutdoorPvP.Wintergrasp.BattleTime = 30
-OutdoorPvP.Wintergrasp.Interval = 150
-OutdoorPvP.Wintergrasp.CustomHonorRewards = 0
-OutdoorPvP.Wintergrasp.CustomHonorBattleWin = 3000
-OutdoorPvP.Wintergrasp.CustomHonorBattleLose = 1250
-OutdoorPvP.Wintergrasp.CustomHonorDamageTower = 750
-OutdoorPvP.Wintergrasp.CustomHonorDestroyedTower = 750
-OutdoorPvP.Wintergrasp.CustomHonorDamagedBuilding = 750
-OutdoorPvP.Wintergrasp.CustomHonorIntactBuilding = 1500
-
 ####################################################################################################################
 # PVP TOKEN SYSTEM /dev/PixelPirate for MaNGOSRev2 & VektorEmu Project
 #
@@ -1782,7 +1707,6 @@ PvPToken.Enable = 1
 PvPToken.ItemID = 43308
 PvPToken.ItemCount = 1
 PvPToken.MapRestriction = 4
-
 
 ###################################################################################################################
 # ARENA CONFIG
